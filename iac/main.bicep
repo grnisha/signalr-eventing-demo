@@ -5,7 +5,7 @@ param nameSuffix string = uniqueString(resourceGroup().id)
 @minLength(3)
 @maxLength(24)
 @description('The name of the storage account')
-param sgName string = 'sg${nameSuffix}'
+param sgName string = 'stg${nameSuffix}'
 
 @allowed([
   'Standard_LRS'
