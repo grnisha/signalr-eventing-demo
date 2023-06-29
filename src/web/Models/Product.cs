@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 
-namespace Demo.SignalR.Shared
+namespace Demo.SignalR.Web.Models
 {
     public class Product
     {

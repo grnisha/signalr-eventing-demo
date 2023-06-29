@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Collections.Generic;
-using Demo.SignalR.Shared;
+using Demo.SignalR.Models;
 
 namespace Demo.SignalR.Api
 {
@@ -17,7 +17,7 @@ namespace Demo.SignalR.Api
     {
         [FunctionName("GetProducts")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest req,
             [CosmosDB(
                 databaseName: "demodb",
                 containerName: "product",

@@ -1,0 +1,128 @@
+param buildNumber string
+param location string = resourceGroup().location
+param nameSuffix string = uniqueString(resourceGroup().id)
+
+@minLength(3)
+@maxLength(24)
+@description('The name of the storage account')
+param sgName string = 'sg${nameSuffix}'
+
+@allowed([
+  'Standard_LRS'
+  'Standard_GRS'
+])
+param sku string = 'Standard_LRS'
+
+param logName string = 'log-${nameSuffix}'
+param appInsName string = 'appInsights-${nameSuffix}'
+param planName string = 'asp-${nameSuffix}'
+param planSku string ='Y1'
+param planTier string ='Dynamic'
+param funcAppName string = 'func-${nameSuffix}'
+param sigrName string = 'sigr-${nameSuffix}'
+param cosmosName string = 'cosmos-${nameSuffix}'
+param swaName string = 'swa-${nameSuffix}'
+
+// SignalR
+module signalRModule 'modules/signalr.bicep' = {
+  name: 'signalR-${buildNumber}'
+  params: {
+    name:sigrName
+    location:location
+  }
+}
+
+//Cosmos DB
+module cosmosDbModule 'modules/cosmosdb.bicep' = {
+  name: 'cosmosdb-${buildNumber}'
+  params: {
+    accountName: cosmosName
+    location:location
+  }
+}
+// Storage account
+module storageAccountModule 'modules/storage.bicep' = {
+  name: 'storageAccount-${buildNumber}'
+  params: {
+    sgName:sgName
+    location:location
+    sku:sku
+  }
+}
+
+// Log Analytics
+module logAnalyticsModule 'modules/loganalytics.bicep' = {
+  name: 'log-${buildNumber}'
+  params: {
+    name: logName
+    location:location
+  }
+}
+// Application insights
+module appInsightsModule 'modules/appinsights.bicep' = {
+  name:'appInsights-${buildNumber}'
+  params:{
+    name:appInsName
+    rgLocation:location
+    workspaceResourceId:logAnalyticsModule.outputs.logAnalyticsWorkspaceId
+  }
+}
+
+// App service plan
+module aspModule 'modules/appserviceplan.bicep' = {
+  name:'appServicePlan-${buildNumber}'
+  params:{
+    planName:planName
+    planLocation:location
+    planSku:planSku
+    planTier:planTier
+  }
+}
+
+
+// Function app (without settings)
+module functionAppModule 'modules/functionapp.bicep' = {
+  name: 'functionApp-${buildNumber}'
+  params:{
+    location:location
+    functionAppName:funcAppName
+    planName:aspModule.outputs.planId
+  }
+  dependsOn:[
+    storageAccountModule
+    aspModule
+  ] 
+}
+
+// Static Web App
+module staticWebAppModule 'modules/staticwebapp.bicep' = {
+  name: 'staticWebApp-${buildNumber}'
+  params:{
+    location:location
+    name :swaName
+    functionAppName:funcAppName
+  }
+  dependsOn:[
+    functionAppModule
+  ]
+}
+
+// Function app settings
+module functionAppSettingsModule 'modules/functionappsettings.bicep' = {
+  name: 'functionAppSettings-${buildNumber}'
+  params: {
+    appInsightsKey: appInsightsModule.outputs.appInsightsKey
+    functionAppName: functionAppModule.outputs.prodFunctionAppName
+    storageAccountConnectionString: storageAccountModule.outputs.storageAccountConnectionString
+    webappUrl: 'https://${staticWebAppModule.outputs.swaHostName}.azurestaticapps.net'
+    cosmosDbConnectionString: cosmosDbModule.outputs.cosmosConnectionString
+    signalRConnectionString: signalRModule.outputs.signalRConnection
+  }  
+  dependsOn:[
+    functionAppModule
+    appInsightsModule
+    staticWebAppModule
+    signalRModule
+    cosmosDbModule
+  ]
+}

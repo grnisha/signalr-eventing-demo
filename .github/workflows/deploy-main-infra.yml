@@ -1,0 +1,36 @@
+name: Deploy Main Infra Resources
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'iac/**'
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout the repo
+      - name: Checkout
+        uses: actions/checkout@v2
+    
+      # Log into Azure
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+         creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    
+      # Deploy Bicep Template
+      - name: Deploy Bicep Template
+        uses: azure/CLI@v1
+        with:
+          azcliversion: latest
+          inlineScript: |
+            az deployment group create --resource-group ${{ secrets.AZURE_RG }}  `
+            --template-file iac/main.bicep  `
+            --parameters "buildNumber=${{ github.run_number }}"  `
+            "location=${{ secrets.LOCATION }}" `
+           

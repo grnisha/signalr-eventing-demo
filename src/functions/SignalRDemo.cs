@@ -11,7 +11,7 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Extensions.SignalRService;
 using Newtonsoft.Json;
 using Microsoft.Extensions.Logging;
-using Demo.SignalR.Shared;
+using Demo.SignalR.Models;
 
 namespace Demo.SignalR.Api
 {
