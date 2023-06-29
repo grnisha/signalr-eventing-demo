@@ -98,4 +98,3 @@ resource signalR 'Microsoft.SignalRService/signalR@2022-02-01' = {
   }
 }
 
-output signalRConnection string = signalR.listKeys('2022-02-01').primaryConnectionString

@@ -16,4 +16,3 @@ resource stg 'Microsoft.Storage/storageAccounts@2021-02-01' = {
   }
 }
 
-output storageAccountConnectionString string = 'DefaultEndpointsProtocol=https;AccountName=${sgName};AccountKey=${stg.listKeys().keys[0].value};EndpointSuffix=core.windows.net'

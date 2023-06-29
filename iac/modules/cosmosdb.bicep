@@ -69,4 +69,3 @@ resource container 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/container
   }
 }
 
-output cosmosConnectionString string = account.listConnectionStrings().connectionStrings[0].connectionString

@@ -111,13 +111,13 @@ module staticWebAppModule 'modules/staticwebapp.bicep' = {
 module functionAppSettingsModule 'modules/functionappsettings.bicep' = {
   name: 'functionAppSettings-${buildNumber}'
   params: {
-    appInsightsKey: appInsightsModule.outputs.appInsightsKey
+    appinsightsName: appInsName
     functionAppName: functionAppModule.outputs.prodFunctionAppName
-    storageAccountConnectionString: storageAccountModule.outputs.storageAccountConnectionString
+    storageAccountName: sgName
     webappUrl: 'https://${staticWebAppModule.outputs.swaHostName}.azurestaticapps.net'
-    cosmosDbConnectionString: cosmosDbModule.outputs.cosmosConnectionString
-    signalRConnectionString: signalRModule.outputs.signalRConnection
-  }  
+    cosmosDbName: cosmosName
+    signalRName: sigrName
+  }
   dependsOn:[
     functionAppModule
     appInsightsModule
