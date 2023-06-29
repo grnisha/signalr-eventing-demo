@@ -13,8 +13,9 @@ param containerName string = 'product'
 resource account 'Microsoft.DocumentDB/databaseAccounts@2022-05-15' = {
   name: toLower(accountName)
   location: location
+  kind: 'GlobalDocumentDB'
   properties: {
-    enableFreeTier: true
+    enableFreeTier: false
     databaseAccountOfferType: 'Standard'
     consistencyPolicy: {
       defaultConsistencyLevel: 'Session'
@@ -22,6 +23,11 @@ resource account 'Microsoft.DocumentDB/databaseAccounts@2022-05-15' = {
     locations: [
       {
         locationName: location
+      }
+    ]
+    capabilities: [
+      {
+        name: 'EnableServerless'
       }
     ]
   }

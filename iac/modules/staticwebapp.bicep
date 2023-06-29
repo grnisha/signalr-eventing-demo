@@ -12,6 +12,7 @@ resource functionApp 'Microsoft.Web/sites@2022-03-01' existing = {
 resource swa 'Microsoft.Web/staticSites@2022-09-01' = {
   name: name
   location: location
+  properties: {}
   sku: {
     name: sku
     tier: sku
