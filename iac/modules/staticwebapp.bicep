@@ -11,39 +11,50 @@ resource functionApp 'Microsoft.Web/sites@2022-03-01' existing = {
   name: functionAppName
 }
 
-resource swa 'Microsoft.Web/staticSites@2022-09-01' = {
+resource swa_resource 'Microsoft.Web/staticSites@2021-01-15' = {
   name: name
   location: location
   tags: null
-  properties: {
-    repositoryUrl: repoUrl
-    branch: 'main'
-    buildProperties: {
-      appLocation: '/src/Web'
-    }
-  }
+  properties: {}
   sku: {
-    name: sku
-    tier: sku
+      name: sku
+      size: sku
   }
 }
 
-resource linkedBackend 'Microsoft.Web/staticSites/linkedBackends@2022-09-01' = {
-  parent: swa
-  name: 'demobackend'
-  properties: {
-    backendResourceId: functionApp.id
-    region: location
-  }
-}
+// resource swa 'Microsoft.Web/staticSites@2022-09-01' = {
+//   name: name
+//   location: location
+//   tags: null
+//   properties: {
+//     repositoryUrl: repoUrl
+//     branch: 'main'
+//     buildProperties: {
+//       appLocation: '/src/Web'
+//     }
+//   }
+//   sku: {
+//     name: sku
+//     tier: sku
+//   }
+// }
 
-resource userprovidedFunction 'Microsoft.Web/staticSites/userProvidedFunctionApps@2022-09-01' = {
-  parent: swa
-  name: 'demobackend'
-  properties: {
-    functionAppResourceId: functionApp.id
-    functionAppRegion: location
-  }
-}
+// resource linkedBackend 'Microsoft.Web/staticSites/linkedBackends@2022-09-01' = {
+//   parent: swa
+//   name: 'demobackend'
+//   properties: {
+//     backendResourceId: functionApp.id
+//     region: location
+//   }
+// }
 
-output swaHostName string = swa.properties.defaultHostname
+// resource userprovidedFunction 'Microsoft.Web/staticSites/userProvidedFunctionApps@2022-09-01' = {
+//   parent: swa
+//   name: 'demobackend'
+//   properties: {
+//     functionAppResourceId: functionApp.id
+//     functionAppRegion: location
+//   }
+// }
+
+// output swaHostName string = swa.properties.defaultHostname
