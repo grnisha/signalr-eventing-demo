@@ -21,7 +21,7 @@ param planTier string ='Dynamic'
 param funcAppName string = 'func-${nameSuffix}'
 param sigrName string = 'sigr-${nameSuffix}'
 param cosmosName string = 'cosmos-${nameSuffix}'
-param swaName string = 'swa-${nameSuffix}'
+//param swaName string = 'swa-${nameSuffix}'
 
 // SignalR
 module signalRModule 'modules/signalr.bicep' = {

@@ -40,9 +40,6 @@ resource database 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases@2022-05-15
     resource: {
       id: databaseName
     }
-    options: {
-      throughput: 1000
-    }
   }
 }
 
