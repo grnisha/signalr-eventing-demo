@@ -25,12 +25,13 @@ jobs:
     
       # Deploy Bicep Template
       - name: Deploy Bicep Template
-        uses: azure/CLI@v1
+        uses: azure/arm-deploy@v1
         with:
-          azcliversion: latest
-          inlineScript: |
-            az deployment group create --resource-group ${{ secrets.AZURE_RG }}  `
-            --template-file iac/main.bicep  `
-            --parameters "buildNumber=${{ github.run_number }}"  `
-            "location=${{ secrets.LOCATION }}" 
+          subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION }}
+          resourceGroupName: ${{ secrets.AZURE_RG }}
+          template: ./iac/main.bicep
+          parameters: 'buildNumber=m${{ github.run_number }} location=${{ secrets.LOCATION }}'
+          failOnStdErr: false
+          deploymentMode: 'Incremental'
+
            
