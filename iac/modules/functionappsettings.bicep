@@ -1,6 +1,5 @@
 param functionAppName string
 param storageAccountName string
-//param webappUrl string
 param cosmosDbName string
 param signalRName string
 param appinsightsName string
@@ -32,12 +31,5 @@ resource functionAppAppsettings 'Microsoft.Web/sites/config@2022-09-01' = {
     FUNCTIONS_WORKER_RUNTIME: 'dotnet'
     CosmosDBConnectionSetting: account.listConnectionStrings().connectionStrings[0].connectionString
     AzureSignalRConnectionString: signalR.listKeys('2022-02-01').primaryConnectionString
-    // cors: {
-    //   allowedOrigins: [
-    //     'https://portal.azure.com'
-    //      webappUrl
-    //   ]
-    //   supportCredentials: true
-    // }
   }
 }
