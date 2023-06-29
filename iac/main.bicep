@@ -95,17 +95,17 @@ module functionAppModule 'modules/functionapp.bicep' = {
 }
 
 // Static Web App
-module staticWebAppModule 'modules/staticwebapp.bicep' = {
-  name: 'staticWebApp-${buildNumber}'
-  params:{
-    location:location
-    name :swaName
-    functionAppName:funcAppName
-  }
-  dependsOn:[
-    functionAppModule
-  ]
-}
+// module staticWebAppModule 'modules/staticwebapp.bicep' = {
+//   name: 'staticWebApp-${buildNumber}'
+//   params:{
+//     location:location
+//     name :swaName
+//     functionAppName:funcAppName
+//   }
+//   dependsOn:[
+//     functionAppModule
+//   ]
+// }
 
 // Function app settings
 module functionAppSettingsModule 'modules/functionappsettings.bicep' = {
@@ -114,14 +114,14 @@ module functionAppSettingsModule 'modules/functionappsettings.bicep' = {
     appinsightsName: appInsName
     functionAppName: functionAppModule.outputs.prodFunctionAppName
     storageAccountName: sgName
-    webappUrl: 'https://${staticWebAppModule.outputs.swaHostName}.azurestaticapps.net'
+    webappUrl: 'http://localhost'//'https://${staticWebAppModule.outputs.swaHostName}.azurestaticapps.net'
     cosmosDbName: cosmosName
     signalRName: sigrName
   }
   dependsOn:[
     functionAppModule
     appInsightsModule
-    staticWebAppModule
+    //staticWebAppModule
     signalRModule
     cosmosDbModule
   ]

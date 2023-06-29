@@ -9,7 +9,7 @@ resource functionApp 'Microsoft.Web/sites@2022-03-01' existing = {
   name: functionAppName
 }
 
-resource swa 'Microsoft.Web/staticSites@2020-12-01' = {
+resource swa 'Microsoft.Web/staticSites@2022-09-01' = {
   name: name
   location: location
   sku: {
@@ -27,7 +27,7 @@ resource linkedBackend 'Microsoft.Web/staticSites/linkedBackends@2022-09-01' = {
   }
 }
 
-resource userprovidedFunction 'Microsoft.Web/staticSites/userProvidedFunctionApps@2020-12-01' = {
+resource userprovidedFunction 'Microsoft.Web/staticSites/userProvidedFunctionApps@2022-09-01' = {
   parent: swa
   name: 'demobackend'
   properties: {
