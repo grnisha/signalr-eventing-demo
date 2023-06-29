@@ -13,13 +13,13 @@ resource stg 'Microsoft.Storage/storageAccounts@2021-02-01' existing = {
   name: storageAccountName
 }
 
-// resource account 'Microsoft.DocumentDB/databaseAccounts@2022-05-15' existing = {
-//   name: cosmosDbName
-// }
+resource account 'Microsoft.DocumentDB/databaseAccounts@2022-05-15' existing = {
+  name: cosmosDbName
+}
 
-// resource signalR 'Microsoft.SignalRService/signalR@2022-02-01' existing = {
-//   name: signalRName
-// }
+resource signalR 'Microsoft.SignalRService/signalR@2022-02-01' existing = {
+  name: signalRName
+}
 
 resource functionAppAppsettings 'Microsoft.Web/sites/config@2022-09-01' = {
   name: '${functionAppName}/appsettings'
@@ -30,8 +30,8 @@ resource functionAppAppsettings 'Microsoft.Web/sites/config@2022-09-01' = {
     WEBSITE_CONTENTSHARE: toLower(functionAppName)
     FUNCTIONS_EXTENSION_VERSION: '~4'
     FUNCTIONS_WORKER_RUNTIME: 'dotnet'
-    // CosmosDBConnectionSetting: account.listConnectionStrings().connectionStrings[0].connectionString
-    // AzureSignalRConnectionString: signalR.listKeys('2022-02-01').primaryConnectionString
+    CosmosDBConnectionSetting: account.listConnectionStrings().connectionStrings[0].connectionString
+    AzureSignalRConnectionString: signalR.listKeys('2022-02-01').primaryConnectionString
     // cors: {
     //   allowedOrigins: [
     //     'https://portal.azure.com'
