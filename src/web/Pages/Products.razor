@@ -1,0 +1,95 @@
+﻿@page "/products"
+@using Demo.SignalR.Shared
+@using Microsoft.AspNetCore.SignalR.Client
+@inject HttpClient _httpClient
+@inject HubConnection _hubConnection;
+
+<h1>Products</h1>
+
+<h2>Polling</h2>
+@if (products == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var prd in products)
+            {
+                <tr>
+                    <td>@prd.Name</td>
+                    <td>@prd.Price</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<h2>SignalR</h2>
+@if (productsFastLoad == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var prd in productsFastLoad)
+            {
+                <tr>
+                    <td>@prd.Name</td>
+                    <td>@prd.Price</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private Product[] products = new Product[]{};
+    private Product[] productsFastLoad = new Product[]{};
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            products = await _httpClient.GetFromJsonAsync<Product[]>("/api/GetProducts") ?? new Product[] { };
+            productsFastLoad = products;
+            System.Timers.Timer t = new System.Timers.Timer();
+            t.Interval = 10000;
+            t.Elapsed += async (s, e) =>
+            {
+                products = await _httpClient.GetFromJsonAsync<Product[]>("/api/GetProducts") ?? new Product[] { };
+                await InvokeAsync(StateHasChanged);
+            };
+            t.Start();
+
+             _hubConnection.On<Product[]>("ProductUpdates", (pdt) =>
+            {
+                productsFastLoad = pdt;
+
+                StateHasChanged();
+            });
+
+            await _hubConnection.StartAsync();
+
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.ToString());
+        }
+    }
+}
