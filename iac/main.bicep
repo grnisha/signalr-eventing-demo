@@ -1,6 +1,6 @@
 param buildNumber string
 param location string = resourceGroup().location
-param nameSuffix string = uniqueString(resourceGroup().id)
+param nameSuffix string = 'xirufkmlaelxk' //uniqueString(resourceGroup().id)
 
 @minLength(3)
 @maxLength(24)
@@ -114,7 +114,7 @@ module functionAppSettingsModule 'modules/functionappsettings.bicep' = {
     appinsightsName: appInsName
     functionAppName: functionAppModule.outputs.prodFunctionAppName
     storageAccountName: sgName
-    webappUrl: 'http://localhost'//'https://${staticWebAppModule.outputs.swaHostName}.azurestaticapps.net'
+    //webappUrl: 'http://localhost'//'https://${staticWebAppModule.outputs.swaHostName}.azurestaticapps.net'
     cosmosDbName: cosmosName
     signalRName: sigrName
   }
