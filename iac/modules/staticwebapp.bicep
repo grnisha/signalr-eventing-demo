@@ -11,7 +11,7 @@ resource functionApp 'Microsoft.Web/sites@2022-03-01' existing = {
   name: functionAppName
 }
 
-resource swa_resource 'Microsoft.Web/staticSites@2021-01-15' = {
+resource swa_resource 'Microsoft.Web/staticSites@2022-09-01' = {
   name: name
   location: location
   tags: null
