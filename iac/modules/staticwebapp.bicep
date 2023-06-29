@@ -3,6 +3,7 @@ param name string
 @allowed([ 'Free', 'Standard' ])
 param sku string = 'Standard'
 param functionAppName string
+param repoUrl string 
 
 //Get function reference
 resource functionApp 'Microsoft.Web/sites@2022-03-01' existing = {
@@ -12,7 +13,13 @@ resource functionApp 'Microsoft.Web/sites@2022-03-01' existing = {
 resource swa 'Microsoft.Web/staticSites@2022-09-01' = {
   name: name
   location: location
-  properties: {}
+  properties: {
+    repositoryUrl: repoUrl
+    branch: 'main'
+    buildProperties: {
+      appLocation: '/src/Web'
+    }
+  }
   sku: {
     name: sku
     tier: sku

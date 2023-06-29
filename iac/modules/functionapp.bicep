@@ -14,7 +14,6 @@ resource functionAppResource 'Microsoft.Web/sites@2022-03-01' = {
     siteConfig: {
       cors: {
         allowedOrigins: [ '*' ]
-        supportCredentials: true
       }
     }
   }

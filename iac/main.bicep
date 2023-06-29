@@ -21,7 +21,8 @@ param planTier string ='Dynamic'
 param funcAppName string = 'func-${nameSuffix}'
 param sigrName string = 'sigr-${nameSuffix}'
 param cosmosName string = 'cosmos-${nameSuffix}'
-//param swaName string = 'swa-${nameSuffix}'
+param swaName string = 'swa-${nameSuffix}'
+param repoUrl string 
 
 // SignalR
 module signalRModule 'modules/signalr.bicep' = {
@@ -95,17 +96,18 @@ module functionAppModule 'modules/functionapp.bicep' = {
 }
 
 // Static Web App
-// module staticWebAppModule 'modules/staticwebapp.bicep' = {
-//   name: 'staticWebApp-${buildNumber}'
-//   params:{
-//     location:location
-//     name :swaName
-//     functionAppName:funcAppName
-//   }
-//   dependsOn:[
-//     functionAppModule
-//   ]
-// }
+module staticWebAppModule 'modules/staticwebapp.bicep' = {
+  name: 'staticWebApp-${buildNumber}'
+  params:{
+    location:location
+    name :swaName
+    functionAppName:funcAppName
+    repoUrl:repoUrl
+  }
+  dependsOn:[
+    functionAppModule
+  ]
+}
 
 // Function app settings
 module functionAppSettingsModule 'modules/functionappsettings.bicep' = {
@@ -114,14 +116,12 @@ module functionAppSettingsModule 'modules/functionappsettings.bicep' = {
     appinsightsName: appInsName
     functionAppName: functionAppModule.outputs.prodFunctionAppName
     storageAccountName: sgName
-    //webappUrl: 'http://localhost'//'https://${staticWebAppModule.outputs.swaHostName}.azurestaticapps.net'
     cosmosDbName: cosmosName
     signalRName: sigrName
   }
   dependsOn:[
     functionAppModule
     appInsightsModule
-    //staticWebAppModule
     signalRModule
     cosmosDbModule
   ]

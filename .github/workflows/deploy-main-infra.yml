@@ -30,7 +30,7 @@ jobs:
           subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION }}
           resourceGroupName: ${{ secrets.AZURE_RG }}
           template: ./iac/main.bicep
-          parameters: 'buildNumber=m${{ github.run_number }} location=${{ secrets.LOCATION }}'
+          parameters: 'buildNumber=m${{ github.run_number }} location=${{ secrets.LOCATION }} repoUrl=${{ github.repositoryUrl }}'
           failOnStdErr: false
           deploymentMode: 'Incremental'
 
