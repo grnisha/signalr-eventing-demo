@@ -1,5 +1,6 @@
-param location string
 param name string
+@allowed([ 'centralus', 'eastus2', 'eastasia', 'westeurope', 'westus2' ])
+param location string
 @allowed([ 'Free', 'Standard' ])
 param sku string = 'Standard'
 param functionAppName string
@@ -13,6 +14,7 @@ resource functionApp 'Microsoft.Web/sites@2022-03-01' existing = {
 resource swa 'Microsoft.Web/staticSites@2022-09-01' = {
   name: name
   location: location
+  tags: null
   properties: {
     repositoryUrl: repoUrl
     branch: 'main'
