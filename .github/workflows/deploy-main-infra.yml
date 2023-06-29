@@ -32,5 +32,5 @@ jobs:
             az deployment group create --resource-group ${{ secrets.AZURE_RG }}  `
             --template-file iac/main.bicep  `
             --parameters "buildNumber=${{ github.run_number }}"  `
-            "location=${{ secrets.LOCATION }}" `
+            "location=${{ secrets.LOCATION }}" 
            
