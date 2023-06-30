@@ -16,7 +16,7 @@ env:
     SWA_PROJECT: './src/web'
 
 jobs:
-    build-swa:
+    deploy-swa:
         runs-on: ubuntu-latest
         steps:
             - name: 'Checkout Code'
@@ -44,18 +44,6 @@ jobs:
               with:
                name: website
                path: ${{ github.workspace }}/${{ env.OUTPUT_FOLDER }}
-               
-    deploy-swa:
-        runs-on: ubuntu-latest 
-        environment: production
-        needs: [build-swa]    
-        permissions:
-            id-token: write
-            contents: read
-            pull-requests: write
-        steps:
-            - name: 'Checkout Code'
-              uses: actions/checkout@v2
 
             - name: 'Login to Azure'
               uses: Azure/login@v1
@@ -71,51 +59,85 @@ jobs:
                     echo "::add-mask::$SWA_DEPLOYMENT_TOKEN"
                     echo SWA_DEPLOYMENT_TOKEN=$SWA_DEPLOYMENT_TOKEN >> $GITHUB_ENV
 
-            - name: Download website
-              uses: actions/download-artifact@v1
-              with:
-                name: website
-                path: ${{ github.workspace }}/${{ env.OUTPUT_FOLDER }}
-
-            - name: Deploy Frontend
+            - name: 'Deploy SWA'
               uses: Azure/static-web-apps-deploy@v1
-              with:
+              with: 
                 azure_static_web_apps_api_token: ${{ steps.swa-token.outputs.SWA_DEPLOYMENT_TOKEN }}
-                repo_token: ${{ secrets.GITHUB_TOKEN }}
-                action: "upload"
-                ###### Repository/Build Configurations - These values can be configured to match your app requirements. ######
-                # For more information regarding Static Web App workflow configurations, please visit: https://aka.ms/swaworkflowconfig
                 app_location: "${{ github.workspace }}/${{ env.OUTPUT_FOLDER }}"
-                ###### End of Repository/Build Configurations ######
+                
 
-    deploy-function:
-        runs-on: windows-latest
-        environment: production
-        steps:
-            - name: 'Checkout Code'
-              uses: actions/checkout@v2
+               
+    # deploy-swa:
+    #     runs-on: ubuntu-latest 
+    #     environment: production
+    #     needs: [build-swa]    
+    #     permissions:
+    #         id-token: write
+    #         contents: read
+    #         pull-requests: write
+    #     steps:
+    #         - name: 'Checkout Code'
+    #           uses: actions/checkout@v2
 
-            - name: 'Login to Azure'
-              uses: Azure/login@v1
-              with:
-                creds: ${{ secrets.AZURE_CREDENTIALS }}
+    #         - name: 'Login to Azure'
+    #           uses: Azure/login@v1
+    #           with:
+    #             creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-            - name: 'Setup .NET'
-              uses: actions/setup-dotnet@v1
-              with:
-                dotnet-version: ${{ env.DOTNET_VERSION_FUNC }}
+    #         - name: Get SWA deployment token
+    #           uses: azure/CLI@v1   
+    #           id: swa-token
+    #           with:
+    #             inlineScript: |
+    #                 SWA_DEPLOYMENT_TOKEN=$(az staticwebapp secrets list -n 'swa-${{ secrets.NAME_SUFFIX }}' -o tsv --query properties.apiKey)
+    #                 echo "::add-mask::$SWA_DEPLOYMENT_TOKEN"
+    #                 echo SWA_DEPLOYMENT_TOKEN=$SWA_DEPLOYMENT_TOKEN >> $GITHUB_ENV
 
-            - name: 'Restore dependencies using dotnet'
-              shell: pwsh
-              run: |
-                pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
-                dotnet build --configuration Release --output ./output
-                popd
+    #         - name: Download website
+    #           uses: actions/download-artifact@v1
+    #           with:
+    #             name: website
+    #             path: ${{ github.workspace }}/${{ env.OUTPUT_FOLDER }}
 
-            - name: 'Deploy Azure Function App'
-              uses: Azure/functions-action@v1
-              id: fa
-              with:
-                app-name: 'func-${{ secrets.NAME_SUFFIX }}'
-                package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/output
+    #         - name: Deploy Frontend
+    #           uses: Azure/static-web-apps-deploy@v1
+    #           with:
+    #             azure_static_web_apps_api_token: ${{ steps.swa-token.outputs.SWA_DEPLOYMENT_TOKEN }}
+    #             repo_token: ${{ secrets.GITHUB_TOKEN }}
+    #             action: "upload"
+    #             ###### Repository/Build Configurations - These values can be configured to match your app requirements. ######
+    #             # For more information regarding Static Web App workflow configurations, please visit: https://aka.ms/swaworkflowconfig
+    #             app_location: "${{ github.workspace }}/${{ env.OUTPUT_FOLDER }}"
+    #             ###### End of Repository/Build Configurations ######
+
+    # deploy-function:
+    #     runs-on: windows-latest
+    #     environment: production
+    #     steps:
+    #         - name: 'Checkout Code'
+    #           uses: actions/checkout@v2
+
+    #         - name: 'Login to Azure'
+    #           uses: Azure/login@v1
+    #           with:
+    #             creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    #         - name: 'Setup .NET'
+    #           uses: actions/setup-dotnet@v1
+    #           with:
+    #             dotnet-version: ${{ env.DOTNET_VERSION_FUNC }}
+
+    #         - name: 'Restore dependencies using dotnet'
+    #           shell: pwsh
+    #           run: |
+    #             pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
+    #             dotnet build --configuration Release --output ./output
+    #             popd
+
+    #         - name: 'Deploy Azure Function App'
+    #           uses: Azure/functions-action@v1
+    #           id: fa
+    #           with:
+    #             app-name: 'func-${{ secrets.NAME_SUFFIX }}'
+    #             package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/output
 
