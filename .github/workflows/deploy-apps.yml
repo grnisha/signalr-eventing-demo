@@ -17,7 +17,7 @@ env:
 
 jobs:
     deploy-swa:
-        runs-on: windows-latest
+        runs-on: linux-latest
         steps:
             - name: 'Checkout Code'
               uses: actions/checkout@v2
@@ -45,12 +45,12 @@ jobs:
             #    name: website
             #    path: ${{ env.OUTPUT_FOLDER }}
 
-            - name: '.NET Build'
-              shell: pwsh
-              run: |
-                pushd './${{ env.SWA_PROJECT }}'
-                dotnet build --configuration Release --output ./output
-                popd
+            # - name: '.NET Build'
+            #   shell: pwsh
+            #   run: |
+            #     pushd './${{ env.SWA_PROJECT }}'
+            #     dotnet build --configuration Release --output ./output
+            #     popd
 
             - name: 'Login to Azure'
               uses: Azure/login@v1
@@ -71,7 +71,7 @@ jobs:
               uses: Azure/static-web-apps-deploy@v1
               with: 
                 azure_static_web_apps_api_token: ${{ env.SWA_DEPLOYMENT_TOKEN }}
-                app_location: ${{ env.SWA_PROJECT }}/output
+                app_location: ${{ env.SWA_PROJECT }}
                 action: "upload"
                 
 
