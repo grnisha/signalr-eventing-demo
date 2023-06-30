@@ -13,6 +13,7 @@ env:
     DOTNET_VERSION: "7.x"
     DOTNET_VERSION_FUNC: "6.0.x"
     AZURE_FUNCTIONAPP_PACKAGE_PATH: './src/functions' 
+    SWA_PROJECT: ${{ github.workspace }}/src/web/Client.csproj
 
 jobs:
     build-swa:
@@ -24,9 +25,9 @@ jobs:
               with:
                   dotnet-version: ${{ env.DOTNET_VERSION }}
             - name: Install dependencies
-              run: dotnet restore --source ${{ github.workspace }}/src/web
+              run: dotnet restore --source ${{ env.SWA_PROJECT }}
             - name: Build
-              run: dotnet build --configuration Release --no-restore --source ./src/web
+              run: dotnet build --configuration Release --no-restore --source ${{ env.SWA_PROJECT }}
             - name: Publish
               run: dotnet publish --configuration Release --no-build --no-restore --output ${{ env.OUTPUT_FOLDER }}
             - name: Publish website output
