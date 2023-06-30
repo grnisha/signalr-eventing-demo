@@ -72,6 +72,8 @@ jobs:
               with: 
                 azure_static_web_apps_api_token: ${{ env.SWA_DEPLOYMENT_TOKEN }}
                 app_location: ${{ env.SWA_PROJECT }}
+                api_location: ""
+                output_location: "wwwroot"
                 action: "upload"
                 app_build_command: "dotnet build"
                 
