@@ -17,7 +17,7 @@ env:
 
 jobs:
     deploy-swa:
-        runs-on: linux-latest
+        runs-on: ubuntu-latest
         steps:
             - name: 'Checkout Code'
               uses: actions/checkout@v2
@@ -73,6 +73,7 @@ jobs:
                 azure_static_web_apps_api_token: ${{ env.SWA_DEPLOYMENT_TOKEN }}
                 app_location: ${{ env.SWA_PROJECT }}
                 action: "upload"
+                app_build_command: "dotnet build"
                 
 
                
