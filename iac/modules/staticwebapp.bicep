@@ -41,4 +41,3 @@ resource userprovidedFunction 'Microsoft.Web/staticSites/userProvidedFunctionApp
   }
 }
 
-// output swaHostName string = swa.properties.defaultHostname

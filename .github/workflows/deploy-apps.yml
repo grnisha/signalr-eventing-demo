@@ -1,0 +1,100 @@
+name: Deploy Apps
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/**'
+  workflow_dispatch:
+
+env:
+    OUTPUT_FOLDER: .output
+    DOTNET_VERSION: "7.x"
+    DOTNET_VERSION_FUNC: "6.0.x"
+    AZURE_FUNCTIONAPP_PACKAGE_PATH: './src/functions' 
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v2
+            - name: Setup .NET
+              uses: actions/setup-dotnet@v3
+              with:
+                  dotnet-version: ${{ env.DOTNET_VERSION }}
+            - name: Install dependencies
+              run: dotnet restore --source ./src/web
+            - name: Build
+              run: dotnet build --configuration Release --no-restore --source ./src/web
+            - name: Publish
+              run: dotnet publish --configuration Release --no-build --no-restore --output ${{ env.OUTPUT_FOLDER }}
+            - name: Publish website output
+              uses: actions/upload-artifact@v3
+              with:
+               name: website
+               path: ${{ github.workspace }}/${{ env.OUTPUT_FOLDER }}
+
+    deploy-swa:
+        runs-on: ubuntu-latest 
+        environment: production
+        needs: [build]    
+        permissions:
+            id-token: write
+            contents: read
+            pull-requests: write
+        steps:
+            - uses: actions/checkout@v2
+            - uses: Azure/login@v1
+              with:
+                  creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+            - name: Get SWA deployment token
+              uses: azure/CLI@v1   
+              id: swa-token
+              with:
+                inlineScript: |
+                    SWA_DEPLOYMENT_TOKEN=$(az staticwebapp secrets list -n 'swa-${{ secrets.NAME_SUFFIX }}' -o tsv --query properties.apiKey)
+                    echo "::add-mask::$SWA_DEPLOYMENT_TOKEN"
+                    echo SWA_DEPLOYMENT_TOKEN=$SWA_DEPLOYMENT_TOKEN >> $GITHUB_ENV
+
+            - name: Download website
+              uses: actions/download-artifact@v1
+              with:
+                name: website
+                path: ${{ github.workspace }}/${{ env.OUTPUT_FOLDER }}
+
+            - name: Deploy Frontend
+              uses: Azure/static-web-apps-deploy@v1
+              with:
+                azure_static_web_apps_api_token: ${{ steps.swa-token.outputs.SWA_DEPLOYMENT_TOKEN }}
+                repo_token: ${{ secrets.GITHUB_TOKEN }}
+                action: "upload"
+                ###### Repository/Build Configurations - These values can be configured to match your app requirements. ######
+                # For more information regarding Static Web App workflow configurations, please visit: https://aka.ms/swaworkflowconfig
+                app_location: "${{ github.workspace }}/${{ env.OUTPUT_FOLDER }}"
+                ###### End of Repository/Build Configurations ######
+
+    deploy-function:
+        runs-on: ubuntu-latest
+        environment: production
+        steps:
+            - uses: actions/checkout@v2
+            - uses: Azure/login@v1
+              with:
+                creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+
+            - name : Zip Azure Function App
+              uses: montudor/action-zip@v0.2.0
+              with:
+                args: zip -r functionapp.zip .
+                working-directory: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+
+            - name: 'Deploy Azure Function App'
+              uses: Azure/functions-action@v3
+              id: fa
+              with:
+                app-name: 'func-${{ secrets.NAME_SUFFIX }}'
+                package: ${{ github.workspace }}/functionapp.zip
+

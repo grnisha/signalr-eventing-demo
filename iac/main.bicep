@@ -1,6 +1,6 @@
 param buildNumber string
 param location string = resourceGroup().location
-param nameSuffix string = 'xirufkmlaelxk' //uniqueString(resourceGroup().id)
+param nameSuffix string //= uniqueString(resourceGroup().id)
 
 @minLength(3)
 @maxLength(24)
