@@ -65,6 +65,8 @@ jobs:
                 azure_static_web_apps_api_token: ${{ steps.swa-token.outputs.SWA_DEPLOYMENT_TOKEN }}
                 app_location: "${{ github.workspace }}/${{ env.OUTPUT_FOLDER }}"
                 action: "upload"
+                deploy_static_web_app: true
+                deployment_token: ${{ steps.swa-token.outputs.SWA_DEPLOYMENT_TOKEN }}
                 
 
                
