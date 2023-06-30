@@ -15,7 +15,7 @@ env:
     AZURE_FUNCTIONAPP_PACKAGE_PATH: './src/functions' 
 
 jobs:
-    build:
+    build-swa:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v2
@@ -24,7 +24,7 @@ jobs:
               with:
                   dotnet-version: ${{ env.DOTNET_VERSION }}
             - name: Install dependencies
-              run: dotnet restore --source ./src/web
+              run: dotnet restore --source ${{ github.workspace }}/src/web
             - name: Build
               run: dotnet build --configuration Release --no-restore --source ./src/web
             - name: Publish
@@ -38,16 +38,19 @@ jobs:
     deploy-swa:
         runs-on: ubuntu-latest 
         environment: production
-        needs: [build]    
+        needs: [build-swa]    
         permissions:
             id-token: write
             contents: read
             pull-requests: write
         steps:
-            - uses: actions/checkout@v2
-            - uses: Azure/login@v1
+            - name: 'Checkout Code'
+              uses: actions/checkout@v2
+
+            - name: 'Login to Azure'
+              uses: Azure/login@v1
               with:
-                  creds: ${{ secrets.AZURE_CREDENTIALS }}
+                creds: ${{ secrets.AZURE_CREDENTIALS }}
 
             - name: Get SWA deployment token
               uses: azure/CLI@v1   
@@ -76,25 +79,33 @@ jobs:
                 ###### End of Repository/Build Configurations ######
 
     deploy-function:
-        runs-on: ubuntu-latest
+        runs-on: windows-latest
         environment: production
         steps:
-            - uses: actions/checkout@v2
-            - uses: Azure/login@v1
+            - name: 'Checkout Code'
+              uses: actions/checkout@v2
+
+            - name: 'Login to Azure'
+              uses: Azure/login@v1
               with:
                 creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-
-            - name : Zip Azure Function App
-              uses: montudor/action-zip@v0.2.0
+            - name: 'Setup .NET'
+              uses: actions/setup-dotnet@v1
               with:
-                args: zip -r functionapp.zip .
-                working-directory: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+                dotnet-version: ${{ env.DOTNET_VERSION_FUNC }}
+
+            - name: 'Restore dependencies using dotnet'
+              shell: pwsh
+              run: |
+                pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
+                dotnet build --configuration Release --output ./output
+                popd
 
             - name: 'Deploy Azure Function App'
-              uses: Azure/functions-action@v3
+              uses: Azure/functions-action@v1
               id: fa
               with:
                 app-name: 'func-${{ secrets.NAME_SUFFIX }}'
-                package: ${{ github.workspace }}/functionapp.zip
+                package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/output
 
