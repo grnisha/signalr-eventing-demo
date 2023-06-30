@@ -13,7 +13,7 @@ env:
     DOTNET_VERSION: "7.x"
     DOTNET_VERSION_FUNC: "6.0.x"
     AZURE_FUNCTIONAPP_PACKAGE_PATH: './src/functions' 
-    SWA_PROJECT: './src/web/Client.csproj'
+    SWA_PROJECT: './src/web'
 
 jobs:
     build-swa:
@@ -28,14 +28,16 @@ jobs:
                   dotnet-version: ${{ env.DOTNET_VERSION }}
 
             - name: Install dependencies
-              run: dotnet restore --source ${{ env.SWA_PROJECT }}
+              run: dotnet restore 
+              working-directory: ${{ env.SWA_PROJECT }}
 
             - name: Build
-              run: dotnet build --configuration Release --no-restore --source ${{ env.SWA_PROJECT }}
+              run: dotnet build --configuration Release --no-restore             
+              working-directory: ${{ env.SWA_PROJECT }}
 
             - name: Publish
               run: dotnet publish --configuration Release --no-build --no-restore --output ${{ env.OUTPUT_FOLDER }}
-              
+
             - name: Publish website output
               uses: actions/upload-artifact@v3
               with:
