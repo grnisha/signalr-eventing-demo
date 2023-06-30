@@ -59,16 +59,13 @@ jobs:
                     echo "::add-mask::$SWA_DEPLOYMENT_TOKEN"
                     echo SWA_DEPLOYMENT_TOKEN=$SWA_DEPLOYMENT_TOKEN >> $GITHUB_ENV
 
-            - run: echo ${{ env.SWA_DEPLOYMENT_TOKEN }}
 
             - name: 'Deploy SWA'
               uses: Azure/static-web-apps-deploy@v1
               with: 
                 azure_static_web_apps_api_token: ${{ env.SWA_DEPLOYMENT_TOKEN }}
-                app_location: "${{ github.workspace }}/${{ env.OUTPUT_FOLDER }}"
+                app_location: "${{ env.OUTPUT_FOLDER }}"
                 action: "upload"
-              #  deploy_static_web_app: true
-              #  deployment_token: ${{ steps.swa-token.outputs.SWA_DEPLOYMENT_TOKEN }}
                 
 
                
