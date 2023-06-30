@@ -36,14 +36,15 @@ jobs:
               working-directory: ${{ env.SWA_PROJECT }}
 
             - name: Publish
-              run: dotnet publish --configuration Release --no-build --no-restore --output ${{ env.OUTPUT_FOLDER }}
+              run: dotnet publish --configuration Release --no-build --no-restore --output ${{ env.OUTPUT_FOLDER }}                        
+              working-directory: ${{ env.SWA_PROJECT }}
 
             - name: Publish website output
               uses: actions/upload-artifact@v3
               with:
                name: website
                path: ${{ github.workspace }}/${{ env.OUTPUT_FOLDER }}
-
+               
     deploy-swa:
         runs-on: ubuntu-latest 
         environment: production
