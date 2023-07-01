@@ -49,10 +49,14 @@
     </tbody>
 </table>
 
+<br />
+
+<button class="btn btn-primary" @onclick="CreateProduct">Add Product</button>
+
 
 @code {
 
-    private List<Product> products = new List<Product>();
+    private List<Demo.SignalR.Web.Models.Product> products = new List<Demo.SignalR.Web.Models.Product>();
 
     protected override async Task OnInitializedAsync()
     {
@@ -68,13 +72,13 @@
             t.Interval = 10000;
             t.Elapsed += async (s, e) =>
             {
-                products = await _httpClient.GetFromJsonAsync<List<Product>>("/api/products") ?? new List<Product>();
+                products = await _httpClient.GetFromJsonAsync<List<Demo.SignalR.Web.Models.Product>>("/api/products") ?? new List<Demo.SignalR.Web.Models.Product>();
                 await InvokeAsync(StateHasChanged);
             };
             t.Start();
 
             //SignalR
-            _hubConnection.On<List<Product>>("ProductUpdates", (pdt) =>
+            _hubConnection.On<List<Demo.SignalR.Web.Models.Product>>("ProductUpdates", (pdt) =>
             {
                 _productService.Products = pdt;
                 StateHasChanged();
@@ -90,6 +94,11 @@
 
     private void ShowProduct(Guid id)
     {
-        _navigationManager.NavigateTo($"/products/{id}");
+        _navigationManager.NavigateTo($"/product/{id}");
+    }
+
+    private void CreateProduct()
+    {
+        _navigationManager.NavigateTo($"/product");
     }
 }

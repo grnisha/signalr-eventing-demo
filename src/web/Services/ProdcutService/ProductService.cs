@@ -22,7 +22,13 @@ namespace Demo.SignalR.Web.ProdcutService
 
         public async Task<Product?> GetProductAsync(Guid id)
         {
-            return await _httpClient.GetFromJsonAsync<Product>($"api/product/{id}");
+            var result = await _httpClient.GetAsync($"api/product/{id}");
+            if (result.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                return null;
+            }
+            
+            return await result.Content.ReadFromJsonAsync<Product>();
         }
 
         public async Task GetProductsAsync()

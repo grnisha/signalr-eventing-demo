@@ -1,0 +1,82 @@
+@page "/product"
+@page "/product/{id}"
+@inject IProductService _productService;
+@inject NavigationManager _navigationManager;
+
+
+@if (Id is null)
+{
+    <h3>Create new product</h3>
+
+}
+else
+{
+    <h3>Edit @_product?.Name</h3>
+}
+
+<EditForm Model="_product" OnSubmit="HandleSubmit">
+    <div>
+        <label for="Name">Name</label>
+        <InputText id="Name" @bind-Value="_product.Name" class="form-control"></InputText>
+    </div>
+    <div>
+        <label for="Price">Price</label>
+        <InputNumber id="Price" @bind-Value="_product.Price" class="form-control"></InputNumber>
+    </div>
+    <br />
+    <div>
+        <button type="submit" class="btn btn-primary">@_btnText</button>
+        <button type="button" class="btn btn-danger" @onclick="Cancel">Cancel</button>
+    </div>
+    
+</EditForm>
+
+@code {
+    [Parameter]
+    public string? Id { get; set; }
+    private string _btnText = string.Empty;
+
+    private Demo.SignalR.Web.Models.Product? _product = new() { Name = string.Empty};
+
+    protected override void OnInitialized()
+    {
+       _btnText = Id is null ? "Create" : "Update";
+    }
+
+   protected override async Task OnParametersSetAsync()
+    {
+        if (Id is not null && Guid.TryParse(Id, out var productId))
+        {
+            _product = await _productService.GetProductAsync(productId);
+            if(_product == null)
+            {
+                _navigationManager.NavigateTo("/product");
+            }
+            
+        }
+        else
+        {
+            _navigationManager.NavigateTo("/product");
+        }
+        
+    }
+
+    private async Task HandleSubmit()
+    {
+        if (Id is null)
+        {
+            _product.Id = Guid.NewGuid();
+            await _productService.AddProductAsync(_product);
+        }
+        else
+        {
+            await _productService.UpdateProductAsync(_product);
+        }
+        _navigationManager.NavigateTo("/products");
+    }
+
+    private void Cancel()
+    {
+        _navigationManager.NavigateTo("/products");
+    }
+}
