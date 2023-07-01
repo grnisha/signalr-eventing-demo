@@ -1,0 +1,21 @@
+###
+POST http://localhost:7071/api/product
+Content-Type: application/json
+
+< .\redbird.json
+
+###
+get http://localhost:7071/api/products
+
+###
+get http://localhost:7071/api/product/616c1b74-2a1f-472d-b6a8-104d068ee61f
+
+###
+PUT http://localhost:7071/api/product
+Content-Type: application/json
+
+< .\yellowbird.json
+
+
+
+

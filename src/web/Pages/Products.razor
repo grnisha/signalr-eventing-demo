@@ -1,95 +1,95 @@
 ﻿@page "/products"
-@using Demo.SignalR.Web.Models
-@using Microsoft.AspNetCore.SignalR.Client
 @inject HttpClient _httpClient
 @inject HubConnection _hubConnection;
+@inject IProductService _productService;
+@inject NavigationManager _navigationManager;
 
 <h1>Products</h1>
 
 <h2>Polling</h2>
-@if (products == null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    <table class="table">
-        <thead>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Price</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var prd in products)
+
+        {
             <tr>
-                <th>Name</th>
-                <th>Price</th>
+                <td>@prd.Name</td>
+                <td>@prd.Price</td>
             </tr>
-        </thead>
-        <tbody>
-            @foreach (var prd in products)
-            {
-                <tr>
-                    <td>@prd.Name</td>
-                    <td>@prd.Price</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
+        }
+    </tbody>
+</table>
 
 <h2>SignalR</h2>
-@if (productsFastLoad == null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    <table class="table">
-        <thead>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Price</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var prd in _productService.Products)
+
+        {
             <tr>
-                <th>Name</th>
-                <th>Price</th>
+                <td>@prd.Name</td>
+                <td>@prd.Price</td>
+                <td><button class="btn btn-primary" @onclick="(() => ShowProduct(prd.Id))"><i class="oi oi-pencil"></i></button></td>
             </tr>
-        </thead>
-        <tbody>
-            @foreach (var prd in productsFastLoad)
-            {
-                <tr>
-                    <td>@prd.Name</td>
-                    <td>@prd.Price</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
+        }
+    </tbody>
+</table>
+
 
 @code {
-    private Product[] products = new Product[]{};
-    private Product[] productsFastLoad = new Product[]{};
+
+    private List<Product> products = new List<Product>();
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            products = await _httpClient.GetFromJsonAsync<Product[]>("/api/GetProducts") ?? new Product[] { };
-            productsFastLoad = products;
+            
+            await _productService.GetProductsAsync();
+            products = _productService.Products;
+          
+
+            //Set timer for non-signalR
             System.Timers.Timer t = new System.Timers.Timer();
             t.Interval = 10000;
             t.Elapsed += async (s, e) =>
             {
-                products = await _httpClient.GetFromJsonAsync<Product[]>("/api/GetProducts") ?? new Product[] { };
+                products = await _httpClient.GetFromJsonAsync<List<Product>>("/api/products") ?? new List<Product>();
                 await InvokeAsync(StateHasChanged);
             };
             t.Start();
 
-             _hubConnection.On<Product[]>("ProductUpdates", (pdt) =>
+            //SignalR
+            _hubConnection.On<List<Product>>("ProductUpdates", (pdt) =>
             {
-                productsFastLoad = pdt;
-
+                _productService.Products = pdt;
                 StateHasChanged();
             });
 
-            await _hubConnection.StartAsync();
-
+            await _hubConnection.StartAsync().ConfigureAwait(false);
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex.ToString());
         }
+    }
+
+    private void ShowProduct(Guid id)
+    {
+        _navigationManager.NavigateTo($"/products/{id}");
     }
 }
