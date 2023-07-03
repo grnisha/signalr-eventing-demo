@@ -3,14 +3,15 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "suffix": {
-      "type": "String",
+      "type": "string",
       "metadata": {
         "description": "Resource name unique suffix"
       }
     },
     "location": {
       "type": "string",
-      "defaultValue": "[resourceGroup().location]",
+      "defaultValue": "West Europe",
+      "allowedValues": [ "West US2", "Central US", "East US2", "West Europe", "East Asia" ],
       "metadata": {
         "description": "Location for all resources."
       }
@@ -137,7 +138,7 @@
     {
       "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases",
       "apiVersion": "2022-05-15",
-      "name": "[format('{0}/{1}', toLower(variables('cosmos_account_name')), 'demodb'')]",
+      "name": "[format('{0}/{1}', toLower(variables('cosmos_account_name')), 'demodb')]",
       "dependsOn": [
         "[resourceId('Microsoft.DocumentDB/databaseAccounts', toLower(variables('cosmos_account_name')))]"
       ],
@@ -229,7 +230,7 @@
     {
       "type": "Microsoft.Web/staticSites",
       "apiVersion": "2022-09-01",
-      "name": "[parameters('swa_name')]",
+      "name": "[variables('swa_name')]",
       "dependsOn": [
         "[resourceId('Microsoft.Web/sites', variables('function_name'))]"
       ],
