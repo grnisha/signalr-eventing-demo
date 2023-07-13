@@ -8,6 +8,6 @@ This demo shows how to use the service bindings in Azure Functions to integrate 
 
 ## Deploy Infra to Azure
 
-[![Deploy Infra to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.github.com%2Fgrnisha%2Fsignalr-eventing-demo%2Fmain%2Fdeploy.json)
+[![Deploy Infra to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fgrnisha%2Fsignalr-eventing-demo%2Fmain%2Fdeploy.json)
 
 
